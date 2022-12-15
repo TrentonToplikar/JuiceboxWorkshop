@@ -2,7 +2,9 @@ const { Client } = require("pg");
 
 async function createUser({ username, password, name, location }) {
   try {
-    const { rows } = await client.query(
+    const {
+      rows: [user],
+    } = await client.query(
       `
       INSERT INTO users(username, password, name, location) 
       VALUES($1, $2, $3, $4) 
@@ -12,7 +14,7 @@ async function createUser({ username, password, name, location }) {
       [username, password, name, location]
     );
 
-    return rows;
+    return user;
   } catch (error) {
     throw error;
   }
@@ -29,8 +31,37 @@ async function getAllUsers() {
   return rows;
 }
 
+async function updateUser(id, fields = {}) {
+  //we are building the set string
+  const setString = Object.keys(fields)
+    .map((key, index) => `"${key}"=$${index + 1}`)
+    .join(", ");
+
+  //return early if fields is empty
+  if (setString.length === 0) {
+    return;
+  }
+
+  try {
+    const {
+      rows: [user],
+    } = await client.query(
+      `
+  UPDATE users
+  set ${setString}
+  WHERE id= ${id}
+  RETURNING *;`,
+      Object.values(fields)
+    );
+    return user;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   client,
   getAllUsers,
   createUser,
+  updateUser,
 };

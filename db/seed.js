@@ -1,4 +1,4 @@
-const { client, getAllUsers, createUser } = require("./index");
+const { client, getAllUsers, createUser, updateUser } = require("./index");
 
 // this function drops all tables from our database by calling a query
 async function dropTables() {
@@ -48,7 +48,6 @@ async function createInitialUsers() {
       password: "bertie99",
       name: "Al Bert",
       location: "Sidney, Australia",
-      active: true,
     });
 
     console.log(albert);
@@ -57,7 +56,6 @@ async function createInitialUsers() {
       password: "2sandy4me",
       name: "Just Sandra",
       location: "Ain't tellin'",
-      active: true,
     });
 
     console.log(sandra);
@@ -67,7 +65,6 @@ async function createInitialUsers() {
       password: "soglam",
       name: "Joshua",
       location: "Upper East Side",
-      active: true,
     });
 
     console.log(glamgal);
@@ -97,6 +94,13 @@ async function testDB() {
 
     const users = await getAllUsers();
     console.log("getAllUsers:", users);
+
+    console.log("Calling updateUser on users[0]");
+    const updateUserResult = await updateUser(users[0].id, {
+      name: "Newname Sogood",
+      location: "lesterville, KY",
+    });
+    console.log("result:", updateUserResult);
 
     console.log("Finished database tests!");
   } catch (error) {
