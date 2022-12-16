@@ -1,12 +1,12 @@
 const {
   client,
-  getAllUsers,
   createUser,
   updateUser,
-  getAllPosts,
+  getAllUsers,
+  getUserById,
   createPost,
   updatePost,
-  getUserById,
+  getAllPosts,
   getPostsByUser,
 } = require("./index");
 
