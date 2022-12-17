@@ -8,6 +8,10 @@ const {
   updatePost,
   getAllPosts,
   getPostsByUser,
+  createTags,
+  getAllTags,
+  addTagsToPost,
+  getpostById,
 } = require("./index");
 
 // this function drops all tables from our database by calling a query
@@ -74,24 +78,6 @@ async function createTables() {
     throw error;
   }
 }
-
-// **************CREATE TAGS******************\\
-async function createTags() {
-  if (taglist.length === 0) {
-    return;
-  }
-  try {
-    console.log("Starting to create tags");
-
-    await client.query(`
-
-    `);
-  } catch (error) {
-    console.log("Error in createTags!!!!!!: ", error);
-  }
-}
-
-// **************END CREATE TAGS******************\\
 
 async function createInitialUsers() {
   try {
@@ -161,6 +147,31 @@ async function createInitialPosts() {
   }
 }
 // **************FINISHED CREATING POSTS ******************
+// ************** CREATING TAGS ******************
+
+async function createInitialTags() {
+  try {
+    console.log("Starting to create tags......");
+
+    const [happy, sad, inspo, catman] = await createTags([
+      "#happy",
+      "#worst-day-ever",
+      "#youcandoanything",
+      "#catmandoeverything",
+    ]);
+
+    const [postOne, postTwo, postThree] = await getAllPosts();
+    await addTagsToPost(postOne.id, [happy, inspo]);
+    await addTagsToPost(postTwo.id, [sad, inspo]);
+    await addTagsToPost(postThree.id[(happy, catman, inspo)]);
+
+    console.log("Finished creating tags!");
+  } catch (error) {
+    console.log("Error creating tags", error);
+  }
+}
+
+// ************** FINISHED CREATING TAGS ******************
 
 async function rebuildDB() {
   try {
@@ -170,6 +181,7 @@ async function rebuildDB() {
     await createTables();
     await createInitialUsers();
     await createInitialPosts();
+    await createInitialTags();
   } catch (error) {
     throw error;
   }
