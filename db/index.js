@@ -76,7 +76,7 @@ async function getUserById(userId) {
 
     // delete user.password;
 
-    console.log("THIS IS THE USER:", user);
+    // console.log("THIS IS THE USER:", user);
     user.posts = await getPostsByUser(userId);
     return user;
   } catch (error) {

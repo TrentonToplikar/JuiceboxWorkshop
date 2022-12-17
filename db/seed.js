@@ -16,10 +16,14 @@ async function dropTables() {
     console.log("Starting to drop tables...");
 
     await client.query(`
-        DROP TABLE IF EXISTS posts;
+      DROP TABLE IF EXISTS post_tags;
 
-        DROP TABLE IF EXISTS users;
-      `);
+      DROP TABLE IF EXISTS tags;
+      
+      DROP TABLE IF EXISTS posts;
+      
+      DROP TABLE IF EXISTS users;
+    `);
 
     console.log("Finished dropping tables!");
   } catch (error) {
@@ -35,23 +39,34 @@ async function createTables() {
 
     await client.query(`
     CREATE TABLE users (
-      id SERIAL PRIMARY KEY,
-      username varchar(255) UNIQUE NOT NULL,
-      password varchar(255) NOT NULL,
-      name VARCHAR(255) NOT NULL,
-      location VARCHAR(255) NOT NULL,
-      active BOOLEAN DEFAULT true
-      );
+    id SERIAL PRIMARY KEY,
+    username varchar(255) UNIQUE NOT NULL,
+    password varchar(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    active BOOLEAN DEFAULT true
+    );
 
       CREATE TABLE posts (
-        id SERIAL PRIMARY KEY,
-        "authorId" INTEGER REFERENCES users(id) NOT NULL,
-        title VARCHAR(255) NOT NULL,
-        content TEXT NOT NULL,
-        active BOOLEAN DEFAULT true
-
+      id SERIAL PRIMARY KEY,
+      "authorId" INTEGER REFERENCES users(id) NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      content TEXT NOT NULL,
+      active BOOLEAN DEFAULT true
       );
-    `);
+        
+        CREATE TABLE tags (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) unique not null
+        );
+          
+          CREATE TABLE post_tags (
+          "postId" INTEGER REFERENCES posts(id),
+          "tagId" INTEGER REFERENCES tags(id),
+          UNIQUE ("postId", "tagId")
+          );
+            
+            `);
 
     console.log("Finished building tables!");
   } catch (error) {
@@ -59,6 +74,24 @@ async function createTables() {
     throw error;
   }
 }
+
+// **************CREATE TAGS******************\\
+async function createTags() {
+  if (taglist.length === 0) {
+    return;
+  }
+  try {
+    console.log("Starting to create tags");
+
+    await client.query(`
+
+    `);
+  } catch (error) {
+    console.log("Error in createTags!!!!!!: ", error);
+  }
+}
+
+// **************END CREATE TAGS******************\\
 
 async function createInitialUsers() {
   try {
