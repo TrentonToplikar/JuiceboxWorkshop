@@ -7,8 +7,9 @@ const {
   createPost,
   updatePost,
   getAllPosts,
-  getPostsByUser,
   createTags,
+  getPostsByUser,
+  createPostTag,
   getAllTags,
   addTagsToPost,
   getpostById,
@@ -146,9 +147,9 @@ async function createInitialPosts() {
     throw error;
   }
 }
+
 // **************FINISHED CREATING POSTS ******************
 // ************** CREATING TAGS ******************
-
 async function createInitialTags() {
   try {
     console.log("Starting to create tags......");
@@ -163,7 +164,7 @@ async function createInitialTags() {
     const [postOne, postTwo, postThree] = await getAllPosts();
     await addTagsToPost(postOne.id, [happy, inspo]);
     await addTagsToPost(postTwo.id, [sad, inspo]);
-    await addTagsToPost(postThree.id[(happy, catman, inspo)]);
+    await addTagsToPost(postThree.id, [happy, catman, inspo]);
 
     console.log("Finished creating tags!");
   } catch (error) {

@@ -93,16 +93,16 @@ async function createPost({ authorId, title, content }) {
       rows: [post],
     } = await client.query(
       `
-                INSERT INTO posts("authorId", title, content) 
-                VALUES($1, $2, $3) 
-                RETURNING *;
-                `,
+      INSERT INTO posts("authorId", title, content)
+      VALUES($1, $2, $3)
+      RETURNING *;
+      `,
       [authorId, title, content]
     );
 
     return post;
   } catch (error) {
-    throw error;
+    console.log("ERROR IN CRESTE POST:", error);
   }
 }
 
@@ -121,10 +121,10 @@ async function updatePost(id, fields = {}) {
   try {
     const { rows: post } = await client.query(
       `
-                  UPDATE posts
-                  SET ${setString}
-                  WHERE id=${id}
-                  RETURNING *;`,
+      UPDATE posts
+      SET ${setString}
+      WHERE id=${id}
+      RETURNING *;`,
       Object.values(fields)
     );
     return post;
@@ -135,11 +135,15 @@ async function updatePost(id, fields = {}) {
 
 async function getAllPosts() {
   try {
-    const { rows: posts } = await client.query(
-      `SELECT *
-                    FROM posts;
-                    `
+    const { rows: postIds } = await client.query(`
+      SELECT id
+      FROM posts;
+    `);
+
+    const posts = await Promise.all(
+      postIds.map((post) => getPostById(post.id))
     );
+
     return posts;
   } catch (error) {
     throw error;
@@ -148,11 +152,17 @@ async function getAllPosts() {
 
 async function getPostsByUser(userId) {
   try {
-    const { rows } = await client.query(`
-                    SELECT * FROM posts
-                    WHERE "authorId"=${userId};
-                    `);
-    return rows;
+    const { rows: postIds } = await client.query(`
+      SELECT id 
+      FROM posts 
+      WHERE "authorId"=${userId};
+    `);
+
+    const posts = await Promise.all(
+      postIds.map((post) => getPostById(post.id))
+    );
+
+    return posts;
   } catch (error) {
     throw error;
   }
@@ -160,7 +170,7 @@ async function getPostsByUser(userId) {
 // ********** END  POSTS***********
 // **************CREATE TAGS******************\\
 
-async function createTags(taglist) {
+const createTags = async (taglist) => {
   try {
     // const { name } = taglist;
     console.log("Creating tags");
@@ -168,7 +178,7 @@ async function createTags(taglist) {
       rows: [newTags],
     } = await client.query(
       `
-      INSERT INTO TAGS(name)
+      INSERT INTO tags(name)
       VALUES ($1)
       ON CONFLICT (name) DO NOTHING
       RETURNING *;
@@ -180,7 +190,7 @@ async function createTags(taglist) {
   } catch (error) {
     console.log("Error in createTags!!!!!!: ", error);
   }
-}
+};
 
 async function createPostTag(postId, tagId) {
   try {
@@ -199,9 +209,8 @@ async function createPostTag(postId, tagId) {
 async function getAllTags() {
   try {
     const { rows: tags } = await client.query(`
-                    SELECT * FROM tags
-                    WHERE name
-                    IN ($1, $2, $3);`);
+    SELECT * FROM tags
+    WHERE IN ($1, $2, $3);`);
     return tags;
   } catch (error) {
     console.log("ERROR IN GETALLTAGS: ", error);
@@ -221,15 +230,15 @@ async function addTagsToPost(postId, tagList) {
   }
 }
 
-async function getpostById(postId) {
+async function getPostById(postId) {
   try {
     const {
       rows: [post],
     } = await client.query(
       `
-                    SELECT *
-                    FROM posts
-                    WHERE id=$1;`,
+      SELECT *
+      FROM posts
+      WHERE id=$1;`,
       [postId]
     );
 
@@ -237,10 +246,10 @@ async function getpostById(postId) {
       rows: [tags],
     } = await client.query(
       `
-                      SELECT tags.*
-                      FROM tags
-                      JOIN post_tags ON tags.id=post_tags."tagId"
-                      WHERE post_tags."postId"=$1;`,
+      SELECT tags.*
+      FROM tags
+      JOIN post_tags ON tags.id=post_tags."tagId"
+      WHERE post_tags."postId"=$1;`,
       [postId]
     );
 
@@ -248,9 +257,9 @@ async function getpostById(postId) {
       rows: [author],
     } = await client.query(
       `
-                    SELECT id, username, name, location
-                    FROM users
-                    WHERE id=$1;`,
+      SELECT id, username, name, location
+      FROM users
+      WHERE id=$1;`,
       [post.authorId]
     );
 
@@ -260,7 +269,7 @@ async function getpostById(postId) {
 
     return post;
   } catch (error) {
-    console.log("Error in getpostbyId: ", error);
+    console.log("Error in getPostbyId: ", error);
   }
 }
 // **************END CREATE TAGS******************\\
@@ -276,7 +285,8 @@ module.exports = {
   getAllPosts,
   getPostsByUser,
   createTags,
+  createPostTag,
   getAllTags,
   addTagsToPost,
-  getpostById,
+  getPostById,
 };
