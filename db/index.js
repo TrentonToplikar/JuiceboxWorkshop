@@ -16,7 +16,7 @@ async function createUser({ username, password, name, location }) {
       [username, password, name, location]
     );
 
-    return tag;
+    return user;
   } catch (error) {
     throw error;
   }
@@ -102,7 +102,7 @@ async function createPost({ authorId, title, content }) {
 
     return post;
   } catch (error) {
-    console.log("ERROR IN CRESTE POST:", error);
+    console.log("ERROR IN CREATE POST:", error);
   }
 }
 
@@ -136,7 +136,7 @@ async function updatePost(id, fields = {}) {
 async function getAllPosts() {
   try {
     const { rows: postIds } = await client.query(`
-      SELECT id
+      SELECT *
       FROM posts;
     `);
 
@@ -170,27 +170,40 @@ async function getPostsByUser(userId) {
 // ********** END  POSTS***********
 // **************CREATE TAGS******************\\
 
-const createTags = async (taglist) => {
+async function createTags(tagList) {
+  if (tagList.length === 0) {
+    return;
+  }
+  // need something like: $1), ($2), ($3
+  const insertValues = tagList.map((_, index) => `$${index + 1}`).join("), (");
+  // then we can use: (${ insertValues }) in our string template
+  // need something like $1, $2, $3
+  const selectValues = tagList.map((_, index) => `$${index + 1}`).join(", ");
+  // then we can use (${ selectValues }) in our string template
+
   try {
-    // const { name } = taglist;
-    console.log("Creating tags");
-    const {
-      rows: [newTags],
-    } = await client.query(
+    await client.query(
       `
       INSERT INTO tags(name)
-      VALUES ($1)
-      ON CONFLICT (name) DO NOTHING
-      RETURNING *;
-      `,
-      [taglist]
+      VALUES (${insertValues})
+      ON CONFLICT (name) DO NOTHING;`,
+      tagList
     );
-    console.log("THESE ARE YOUR TAGS  :", newTags);
-    return newTags;
+    // return the rows from the query
+    const { rows } = await client.query(
+      `
+      SELECT * FROM tags
+      WHERE name
+      IN (${selectValues});
+      `,
+      tagList
+    );
+    console.log("THESE ARE MY NEW TAGS:", rows);
+    return rows;
   } catch (error) {
-    console.log("Error in createTags!!!!!!: ", error);
+    throw error;
   }
-};
+}
 
 async function createPostTag(postId, tagId) {
   try {
@@ -198,7 +211,7 @@ async function createPostTag(postId, tagId) {
       `
       INSERT INTO post_tags("postId", "tagId")
       VALUES ($1, $2)
-      ON CONFLICT ("postId", "tagId",) DO NOTHING
+      ON CONFLICT ("postId", "tagId") DO NOTHING
       `,
       [postId, tagId]
     );
@@ -206,6 +219,7 @@ async function createPostTag(postId, tagId) {
     console.log("Error in createPostTag! ", error);
   }
 }
+
 async function getAllTags() {
   try {
     const { rows: tags } = await client.query(`
