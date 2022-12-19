@@ -16,7 +16,7 @@ async function createUser({ username, password, name, location }) {
       [username, password, name, location]
     );
 
-    return user;
+    return tag;
   } catch (error) {
     throw error;
   }
