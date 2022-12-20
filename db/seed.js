@@ -8,11 +8,11 @@ const {
   updatePost,
   getAllPosts,
   getPostsByTagName,
-  createTags,
-  getPostsByUser,
-  createPostTag,
-  getAllTags,
-  addTagsToPost,
+  // createTags,
+  // getPostsByUser,
+  // createPostTag,
+  // getAllTags,
+  // addTagsToPost,
   getpostById,
 } = require("./index");
 
@@ -53,26 +53,25 @@ async function createTables() {
     active BOOLEAN DEFAULT true
     );
 
-      CREATE TABLE posts (
-      id SERIAL PRIMARY KEY,
-      "authorId" INTEGER REFERENCES users(id) NOT NULL,
-      title VARCHAR(255) NOT NULL,
-      content TEXT NOT NULL,
-      active BOOLEAN DEFAULT true
-      );
+    CREATE TABLE posts (
+    id SERIAL PRIMARY KEY,
+    "authorId" INTEGER REFERENCES users(id) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    active BOOLEAN DEFAULT true
+    );
         
-        CREATE TABLE tags (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) unique not null
-        );
+    CREATE TABLE tags (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) unique not null
+    );
           
-          CREATE TABLE post_tags (
-          "postId" INTEGER REFERENCES posts(id),
-          "tagId" INTEGER REFERENCES tags(id),
-          UNIQUE ("postId", "tagId")
-          );
-            
-            `);
+    CREATE TABLE post_tags (
+    "postId" INTEGER REFERENCES posts(id),
+    "tagId" INTEGER REFERENCES tags(id),
+    UNIQUE ("postId", "tagId")
+    );
+    `);
 
     console.log("Finished building tables!");
   } catch (error) {
@@ -91,15 +90,14 @@ async function createInitialUsers() {
       name: "Al Bert",
       location: "Sidney, Australia",
     });
-
     console.log(albert);
+
     const sandra = await createUser({
       username: "sandra",
       password: "2sandy4me",
       name: "Just Sandra",
       location: "Ain't tellin'",
     });
-
     console.log(sandra);
 
     const glamgal = await createUser({
@@ -108,7 +106,6 @@ async function createInitialUsers() {
       name: "Joshua",
       location: "Upper East Side",
     });
-
     console.log(glamgal);
 
     console.log("Finished creating users!");
@@ -156,20 +153,6 @@ async function createInitialPosts() {
 
 // **************FINISHED CREATING POSTS ******************
 
-async function rebuildDB() {
-  try {
-    client.connect();
-
-    await dropTables();
-    await createTables();
-    await createInitialUsers();
-    await createInitialPosts();
-  } catch (error) {
-    console.log("Error during rebuildDB");
-    throw error;
-  }
-}
-
 async function testDB() {
   try {
     console.log("Starting to test database...");
@@ -213,6 +196,20 @@ async function testDB() {
     console.log("Finished database tests!");
   } catch (error) {
     console.log("Error during testDB");
+    throw error;
+  }
+}
+
+async function rebuildDB() {
+  try {
+    client.connect();
+
+    await dropTables();
+    await createTables();
+    await createInitialUsers();
+    await createInitialPosts();
+  } catch (error) {
+    console.log("Error during rebuildDB");
     throw error;
   }
 }

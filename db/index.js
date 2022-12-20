@@ -1,7 +1,7 @@
 const { Client } = require("pg");
 const client = new Client("postgres://localhost:5432/juicebox");
 
-//************ START USERS************** */
+//************************** START USERS**************************** */
 async function createUser({ username, password, name, location }) {
   try {
     const {
@@ -84,7 +84,7 @@ async function getUserById(userId) {
     console.log("Error in getUserById: ", error);
   }
 }
-//************ END USERS************** */
+//************************** END USERS**************************** */
 
 // ******** START POSTS************
 async function createPost({ authorId, title, content, tags = [] }) {
@@ -113,7 +113,6 @@ async function updatePost(postId, fields = {}) {
   const { tags } = fields; // might be undefined
   delete fields.tags;
 
-  // build the set string
   const setString = Object.keys(fields)
     .map((key, index) => `"${key}"=$${index + 1}`)
     .join(", ");
@@ -131,7 +130,6 @@ async function updatePost(postId, fields = {}) {
         Object.values(fields)
       );
     }
-
     // return early if there's no tags to update
     if (tags === undefined) {
       return await getPostById(postId);
@@ -215,8 +213,8 @@ async function getPostsByTagName(tagName) {
   }
 }
 
-// ********** END  POSTS***********
-// **************CREATE TAGS******************\\
+// ************************ END  POSTS *************************\\
+// *********************** CREATE TAGS *****************************\\
 
 async function createTags(tagList) {
   if (tagList.length === 0) {
@@ -335,7 +333,7 @@ async function getPostById(postId) {
     console.log("Error in getPostbyId: ", error);
   }
 }
-// **************END CREATE TAGS******************\\
+// **************************** END CREATE TAGS ********************************\\
 
 module.exports = {
   client,
