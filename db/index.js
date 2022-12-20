@@ -270,7 +270,7 @@ async function getAllTags() {
   try {
     const { rows: tags } = await client.query(`
     SELECT * FROM tags
-    WHERE IN ($1, $2, $3);`);
+    `);
     return tags;
   } catch (error) {
     console.log("ERROR IN GETALLTAGS: ", error);

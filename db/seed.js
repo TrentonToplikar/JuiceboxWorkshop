@@ -185,7 +185,7 @@ async function testDB() {
     //new!!!!!!!!!!!!!!!
     console.log("Calling updatePost on posts[1], only updating tags");
     const updatePostTagsResult = await updatePost(posts[1].id, {
-      tags: ["#youcandoanything", "#redfish", "#bluefish"],
+      tags: ["#youcandoanything", "#scalliwag", "#codfish"],
     });
     console.log("Result:", updatePostTagsResult);
     // NEW!!!!!!
