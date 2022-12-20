@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const { Client } = require("pg");
 const client = new Client("postgres://localhost:5432/juicebox");
 
@@ -82,6 +84,23 @@ async function getUserById(userId) {
     return user;
   } catch (error) {
     console.log("Error in getUserById: ", error);
+  }
+}
+
+async function getUserByUsername(username) {
+  try {
+    const {
+      rows: [user],
+    } = await client.query(
+      `
+    SELECT * 
+    FROM users
+    Where username=$1;`,
+      [username]
+    );
+    return user;
+  } catch (error) {
+    console.log("Error in getUserByUsername");
   }
 }
 //************************** END USERS**************************** */
@@ -341,6 +360,7 @@ module.exports = {
   updateUser,
   getAllUsers,
   getUserById,
+  getUserByUsername,
   createPost,
   updatePost,
   getAllPosts,

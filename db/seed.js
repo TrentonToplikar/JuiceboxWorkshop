@@ -8,11 +8,12 @@ const {
   updatePost,
   getAllPosts,
   getPostsByTagName,
-  // createTags,
-  // getPostsByUser,
-  // createPostTag,
-  // getAllTags,
-  // addTagsToPost,
+  getUserByUsername,
+  createTags,
+  getPostsByUser,
+  createPostTag,
+  getAllTags,
+  addTagsToPost,
   getpostById,
 } = require("./index");
 
