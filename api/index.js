@@ -4,18 +4,19 @@ const jwt = require("jsonwebtoken");
 const { getUserById } = require("../db");
 const { JWT_SECRET } = process.env;
 
-// if possible se the req.user
+// iAuthorization middleware verify the JWTR is valid and attatch the user to the req
 apiRouter.use(async (req, res, next) => {
   const prefix = "Bearer ";
   const auth = req.header("Authorization");
 
   if (!auth) {
-    // nothing to see here
+    // You are not authorized
     next();
   } else if (auth.startsWith(prefix)) {
     const token = auth.slice(prefix.length);
 
     try {
+      //verify the jwt is valid
       const { id } = jwt.verify(token, JWT_SECRET);
 
       if (id) {
@@ -41,6 +42,7 @@ apiRouter.use((req, res, next) => {
   next();
 });
 
+/****** Sub routes below ***** */
 const usersRouter = require("./users");
 const postsRouter = require("./posts");
 const tagsRouter = require("./tags");

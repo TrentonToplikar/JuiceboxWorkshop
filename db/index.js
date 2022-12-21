@@ -107,6 +107,7 @@ async function getUserByUsername(username) {
 
 // ******** START POSTS************
 async function createPost({ authorId, title, content, tags = [] }) {
+  console.log("THIS IS THE AUthoRID----------->", authorId);
   try {
     const {
       rows: [post],

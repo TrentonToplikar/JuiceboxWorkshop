@@ -20,19 +20,22 @@ usersRouter.get("/", async (req, res) => {
 
 // ************ LOGIN ************ \\
 usersRouter.post("/login", async (req, res, next) => {
-  const { username, password } = req.body;
-  // request must have both username and password!!!
-  if (!username || !password) {
-    next({
-      name: "MissingCredentialsError",
-      message: "Please supply both a username and password",
-    });
-  }
-
   try {
+    const { username, password } = req.body;
+    // request must have both username and password!!!
+    if (!username || !password) {
+      next({
+        name: "MissingCredentialsError",
+        message: "Please supply both a username and password",
+      });
+    }
+
     const user = await getUserByUsername(username);
+    console.log("user retrieved:", user);
     if (user && user.password == password) {
       // create token & return to user
+      // maybe delete your password!
+      delete user.password;
       const token = jwt.sign(user, JWT_SECRET);
       res.send({ message: "you're logged in!", token });
     } else {
