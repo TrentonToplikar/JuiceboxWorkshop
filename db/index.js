@@ -323,6 +323,15 @@ async function getPostById(postId) {
       [postId]
     );
 
+    //recently added
+    if (!post) {
+      throw {
+        name: "PostNotFoundError",
+        message: "Could not find a post with that postId",
+      };
+    }
+    // helps with the deletepostbyID
+
     const {
       rows: [tags],
     } = await client.query(
@@ -346,6 +355,7 @@ async function getPostById(postId) {
 
     post.tags = tags;
     post.author = author;
+
     delete post.authorId;
 
     return post;
