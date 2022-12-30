@@ -3,6 +3,44 @@ const postsRouter = express.Router();
 const { getAllPosts, createPost, updatePost, getPostById } = require("../db");
 const { requireUser } = require("./utils");
 
+postsRouter.use((req, res, next) => {
+  console.log("A request is being made to /posts");
+
+  next();
+});
+
+postsRouter.get("/", async (req, res, next) => {
+  try {
+    const allPosts = await getAllPosts();
+    // ******** what you could have used instead to filter posts *********** \\
+
+    // const posts = allPosts.filter(post => {
+    //   // the post is active, doesn't matter who it belongs to
+    //   if (post.active) {
+    //     return true;
+    //   }
+
+    //   // the post is not active, but it belogs to the current user
+    //   if (req.user && post.author.id === req.user.id) {
+    //     return true;
+    //   }
+
+    //   // none of the above are true
+    //   return false;
+    // });
+
+    const posts = allPosts.filter((post) => {
+      return post.active || (req.user && post.author.id === req.user.id);
+    });
+
+    res.send({
+      posts,
+    });
+  } catch ({ name, message }) {
+    next({ name, message });
+  }
+});
+
 postsRouter.post("/", requireUser, async (req, res, next) => {
   const { title, content, tags = "" } = req.body;
   // console.log(req.body);
@@ -40,11 +78,9 @@ postsRouter.patch("/:postId", requireUser, async (req, res, next) => {
   if (tags && tags.length > 0) {
     updateFields.tags = tags.trim().split(/\s+/);
   }
-
   if (title) {
     updateFields.title = title;
   }
-
   if (content) {
     updateFields.content = content;
   }
@@ -88,43 +124,6 @@ postsRouter.delete("/:postId", requireUser, async (req, res, next) => {
             }
       );
     }
-  } catch ({ name, message }) {
-    next({ name, message });
-  }
-});
-
-postsRouter.use((req, res, next) => {
-  console.log("A request is being made to /posts");
-
-  next();
-});
-
-postsRouter.get("/", async (req, res, next) => {
-  try {
-    const allPosts = await getAllPosts();
-
-    // const posts = allPosts.filter(post => {
-    //   // the post is active, doesn't matter who it belongs to
-    //   if (post.active) {
-    //     return true;
-    //   }
-
-    //   // the post is not active, but it belogs to the current user
-    //   if (req.user && post.author.id === req.user.id) {
-    //     return true;
-    //   }
-
-    //   // none of the above are true
-    //   return false;
-    // });
-
-    const posts = allPosts.filter((post) => {
-      return post.active || (req.user && post.author.id === req.user.id);
-    });
-
-    res.send({
-      posts,
-    });
   } catch ({ name, message }) {
     next({ name, message });
   }

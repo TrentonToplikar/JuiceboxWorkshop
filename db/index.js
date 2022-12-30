@@ -73,11 +73,6 @@ async function getUserById(userId) {
             `,
       [userId]
     );
-    // if (rows.length === 0) {
-    //   return null;
-    // }
-
-    // delete user.password;
 
     // console.log("THIS IS THE USER:", user);
     user.posts = await getPostsByUser(userId);
@@ -107,7 +102,6 @@ async function getUserByUsername(username) {
 
 // ******** START POSTS************
 async function createPost({ authorId, title, content, tags = [] }) {
-  console.log("THIS IS THE AUthoRID----------->", authorId);
   try {
     const {
       rows: [post],
@@ -130,7 +124,7 @@ async function createPost({ authorId, title, content, tags = [] }) {
 
 async function updatePost(postId, fields = {}) {
   // read off the tags & remove that field
-  const { tags } = fields; // might be undefined
+  const { tags } = fields;
   delete fields.tags;
 
   const setString = Object.keys(fields)
@@ -198,11 +192,13 @@ async function getAllPosts() {
 
 async function getPostsByUser(userId) {
   try {
-    const { rows: postIds } = await client.query(`
+    const { rows: postIds } = await client.query(
+      `
       SELECT id 
       FROM posts 
       WHERE "authorId"=${userId};
-    `);
+    `
+    );
 
     const posts = await Promise.all(
       postIds.map((post) => getPostById(post.id))
@@ -242,10 +238,10 @@ async function createTags(tagList) {
   }
   // need something like: $1), ($2), ($3
   const insertValues = tagList.map((_, index) => `$${index + 1}`).join("), (");
-  // then we can use: (${ insertValues }) in our string template
+  // now we can use: (${ insertValues }) in our string template
   // need something like $1, $2, $3
   const selectValues = tagList.map((_, index) => `$${index + 1}`).join(", ");
-  // then we can use (${ selectValues }) in our string template
+  // now we can use (${ selectValues }) in our string template
 
   try {
     await client.query(
@@ -291,6 +287,7 @@ async function getAllTags() {
     const { rows: tags } = await client.query(`
     SELECT * FROM tags
     `);
+
     return tags;
   } catch (error) {
     console.log("ERROR IN GETALLTAGS: ", error);
@@ -323,7 +320,6 @@ async function getPostById(postId) {
       [postId]
     );
 
-    //recently added
     if (!post) {
       throw {
         name: "PostNotFoundError",

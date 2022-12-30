@@ -8,12 +8,6 @@ const {
   updatePost,
   getAllPosts,
   getPostsByTagName,
-  getUserByUsername,
-  createTags,
-  getPostsByUser,
-  createPostTag,
-  getAllTags,
-  addTagsToPost,
   getpostById,
 } = require("./index");
 
@@ -47,8 +41,8 @@ async function createTables() {
     await client.query(`
     CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    username varchar(255) UNIQUE NOT NULL,
-    password varchar(255) NOT NULL,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     location VARCHAR(255) NOT NULL,
     active BOOLEAN DEFAULT true
@@ -80,7 +74,7 @@ async function createTables() {
     throw error;
   }
 }
-
+// this function creates all of our users
 async function createInitialUsers() {
   try {
     console.log("Starting to create users...");
@@ -115,10 +109,7 @@ async function createInitialUsers() {
     throw error;
   }
 }
-
-// ********************** CREATING POSTS ******************
-// async function createPostTables() was used in the function above called createTables
-
+//this function creates all of our posts
 async function createInitialPosts() {
   try {
     const [albert, sandra, glamgal] = await getAllUsers();
@@ -152,8 +143,7 @@ async function createInitialPosts() {
   }
 }
 
-// **************FINISHED CREATING POSTS ******************
-
+//test our database
 async function testDB() {
   try {
     console.log("Starting to test database...");
@@ -183,13 +173,13 @@ async function testDB() {
     console.log("Calling getUserById with 1");
     const albert = await getUserById(1);
     console.log("Result:", albert);
-    //new!!!!!!!!!!!!!!!
+
     console.log("Calling updatePost on posts[1], only updating tags");
     const updatePostTagsResult = await updatePost(posts[1].id, {
       tags: ["#youcandoanything", "#scalliwag", "#codfish"],
     });
     console.log("Result:", updatePostTagsResult);
-    // NEW!!!!!!
+
     console.log("Calling getPostsByTagName with #happy");
     const postsWithHappy = await getPostsByTagName("#happy");
     console.log("Result:", postsWithHappy);

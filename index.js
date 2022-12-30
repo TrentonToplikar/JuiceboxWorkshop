@@ -1,16 +1,14 @@
 const express = require("express");
+const morgan = require("morgan");
+const apiRouter = require("./api");
 const server = express();
 const { client } = require("./db");
 client.connect();
 const PORT = 3000;
 
-const morgan = require("morgan");
-server.use(morgan("dev"));
 server.use(express.json());
-
-const apiRouter = require("./api");
+server.use(morgan("dev"));
 server.use("/api", apiRouter);
-
 server.use((req, res, next) => {
   console.log("<____Body Logger START____>");
   console.log(req.body);

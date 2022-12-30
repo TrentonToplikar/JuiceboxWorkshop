@@ -10,6 +10,7 @@ usersRouter.use((req, res, next) => {
   // res.send({ message: "hello from /users ahhhhh!!!" });
   next();
 });
+
 usersRouter.get("/", async (req, res) => {
   const users = await getAllUsers();
 
@@ -35,8 +36,8 @@ usersRouter.post("/login", async (req, res, next) => {
     if (user && user.password == password) {
       // create token & return to user
       // maybe delete your password!
-      delete user.password;
       const token = jwt.sign(user, JWT_SECRET);
+      delete user.password;
       res.send({ message: "you're logged in!", token });
     } else {
       next({
@@ -57,7 +58,6 @@ usersRouter.post("/register", async (req, res, next) => {
 
   try {
     const _user = await getUserByUsername(username);
-
     if (_user) {
       next({
         name: "UserExistsError",

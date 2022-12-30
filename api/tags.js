@@ -19,7 +19,7 @@ tagsRouter.get("/:tagName/posts", async (req, res, next) => {
   try {
     const posts = await getPostsByTagName(tagName);
 
-    // use our method to get posts by tag name from the db
+    // use this method to get posts by tag name from the db
     if (posts.length) {
       res.send({ posts });
     } else {
